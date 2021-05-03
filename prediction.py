@@ -7,7 +7,7 @@ import argparse
 import json
 import sys
 from tqdm import tqdm, trange
-
+wrong = []
 def normalize_answer(s):
     """Lower text and remove punctuation, articles and extra whitespace."""
     def remove_articles(text):
@@ -65,47 +65,31 @@ def evaluate(dataset, predictions):
     f1 = exact_match = total = 0
     for data in tqdm(dataset['data']):
         for d in data['paragraphs']:
-            text = d['context']
-            word = text.split(' ',3)[0:2]
-            ground_truths = find_articles(dataset, word)
-            for i in d['qas']:
-                ground_truths.append(i['answers'][0]['text'])
-            for pred in tqdm(predictions['data']):
-                for p in pred['paragraphs']:
-                    pred_text = p['context']
-                    word_pred = pred_text.split(' ',3)[0:2]
-                    if word == word_pred:
-                        print("in")
-                        pred_ans = find_articles(predictions,word_pred)
-                        for j in p['qas']:
-                            pred_ans.append(j['answers'][0]['text'])
-                        for ans in pred_ans:
-                            total += 1
-                            exact_match += metric_max_over_ground_truths(exact_match_score, ans, ground_truths)
-                            f1 += metric_max_over_ground_truths(f1_score, ans, ground_truths)
-               
+            try:
+                context_id = d['context_id']
+                ground_truths = []
+                for qa in d['qas']:
+                    for a in qa['answers']:
+                        ground_truths.append(a['text'])
+                for article in predictions['data']:
+                    for p in article['paragraphs']:
+                        if p['context_id'] == context_id:
+                            pred_ans = []
+                            for pqa in p['qas']:
+                                for pa in pqa['answers']:
+                                    pred_ans.append(pa['text']) 
+                            for ans in pred_ans:
+                                total += 1
+                                exact_match += metric_max_over_ground_truths(exact_match_score, ans, ground_truths)
+                                f1 += metric_max_over_ground_truths(f1_score, ans, ground_truths)
+            except KeyError:
+                wrong.append(d['context'])
+                pass     
             
     print("total = ",total)
     print("exact_match = ",exact_match)
     print("f1 = ",f1)
-    '''for article in dataset:
-                    for paragraph in article['paragraphs']:
-                        paragraph_id = paragraph['id']
-                        for qa in paragraph['qas']:
-                            total += 1
-                            if qa['id'] not in predictions:
-                                message = 'Unanswered question ' + qa['id'] + \
-                                          ' will receive score 0.'
-                                print(message, file=sys.stderr)
-                                continue
-                            ground_truths = list(map(lambda x: x['text'], qa['answers']))
-                            print(ground_truths)
-                            prediction = predictions[qa['id']]
-                            print(prediction)
-                            exact_match += metric_max_over_ground_truths(
-                                exact_match_score, prediction, ground_truths)
-                            f1 += metric_max_over_ground_truths(
-                                f1_score, prediction, ground_truths)'''
+
 
     exact_match = 100.0 * exact_match / total
     f1 = 100.0 * f1 / total
@@ -130,3 +114,5 @@ if __name__ == '__main__':
     with open(args.prediction_file) as prediction_file:
         predictions = json.load(prediction_file)
     print(json.dumps(evaluate(dataset, predictions)))
+    with open("error.json","w") as writefile:
+        json.dump(wrong,writefile)
