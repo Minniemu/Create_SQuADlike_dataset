@@ -291,8 +291,19 @@ Dataset
 7. squad7
 > training data : train-v1.1.json + train-v3.3_rand.json(隨機選擇六千筆)
 > 
+> Results: {'exact': 80.52034058656575, 'f1': 88.21159376037637, 'total': 10570, 'HasAns_exact': 80.52034058656575, 'HasAns_f1': 88.21159376037637, 'HasAns_total': 10570, 'best_exact': 80.52034058656575, 'best_exact_thresh': 0.0, 'best_f1': 88.21159376037637, 'best_f1_thresh': 0.0}
+8. squad8
+> training data: train-v1.1.json + train-v3.4.json(將q的品質較好的前六千筆作為資料)
+
+> Results: {'exact': 80.59602649006622, 'f1': 88.2671292604995, 'total': 10570, 'HasAns_exact': 80.59602649006622, 'HasAns_f1': 88.2671292604995, 'HasAns_total': 10570, 'best_exact': 80.59602649006622, 'best_exact_thresh': 0.0, 'best_f1': 88.2671292604995, 'best_f1_thresh': 0.0}
+9. squad9
+> training data: train-v1.1.json + train-v3.3_len.json(將平均長度前六千筆作為訓練資料)
+
+>  Results: {'exact': 80.52980132450331, 'f1': 88.19517709908695, 'total': 10570, 'HasAns_exact': 80.52980132450331, 'HasAns_f1': 88.19517709908695, 'HasAns_total': 10570, 'best_exact': 80.52980132450331, 'best_exact_thresh': 0.0, 'best_f1': 88.19517709908695, 'best_f1_thresh': 0.0}
+
+
 * 252 
-9. squad1
+1. squad1
 > training data : train_v1.1.json + train_v3.1.json(留下與qa model不同的答案)
 
 > result : Results: {'exact': 79.85808893093662, 'f1': 87.62966929999214, 'total': 10570, 'HasAns_exact': 79.85808893093662, 'HasAns_f1': 87.62966929999214, 'HasAns_total': 10570, 'best_exact': 79.85808893093662, 'best_exact_thresh': 0.0, 'best_f1': 87.62966929999214, 'best_f1_thresh': 0.0}
